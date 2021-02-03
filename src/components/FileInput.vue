@@ -1,31 +1,41 @@
 <template>
     <div class="FileInput">
-        <input @change="changeText" class="FileInput__input" type="file" name="photo" accept="">
-        <button @click.prevent="chouseFile" class="FileInput__button">Choose a file</button>
+        <input @change="checkExtentionAndParseCSV" class="FileInput__input" type="file" name="photo">
+        <button @click.prevent="chouseFile" class="FileInput__button">Impor User</button>
     </div>
 </template>
 
 <script>
+    import {mapActions} from 'vuex'
+
     export default {
+        name: "FileInput",
         data(){
             return{
                 input: '',
-                button: '',
             }
         },
         methods:{
+            ...mapActions([
+                'PARSE_CSV',
+                'GET_EXT'
+            ]),
             chouseFile(){
                 this.input.click()
             },
-            changeText(){
-                this.button.innerText = this.input.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1].split('').slice(0, 22).join('')
-            },
+            checkExtentionAndParseCSV(){
+                let file = this.input.files[0]
+                let fileName = this.input.value
+                let ext = this.GET_EXT(fileName)
+                if(ext){
+                    this.PARSE_CSV(file)
+                }
+            }
         },
         mounted(){
             let v = this
             this.$nextTick(()=>{
                 v.input = document.querySelector('.FileInput__input')
-                v.button = document.querySelector('.FileInput__button')
             })
         }
     }
@@ -52,7 +62,7 @@
         padding: 5px;
 
         color: white;
-        font-family: 'Andika';
+        font-size: 16px;
 
         overflow: hidden;
     }

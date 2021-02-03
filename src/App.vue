@@ -3,7 +3,6 @@
     <div class="parser">
         <Table class="parser__table"></Table>
         <FileInput class="parser__file"></FileInput>
-        <ErrorAlert v-show="showAlert" class="parser__alert"></ErrorAlert>
     </div>
   </div>
 </template>
@@ -11,24 +10,23 @@
 <script>
 import Table from './components/Table.vue'
 import FileInput from './components/FileInput.vue'
-import ErrorAlert from './components/ErrorAlert.vue'
 
 export default {
   name: 'App',
   components: {
     Table,
     FileInput,
-    ErrorAlert
   },
   data(){
     return{
       showAlert: false,
     }
-  }
+  },
 }
 </script>
 
 <style lang="scss">
+@import './assets/fonts/Roboto/stylesheet.css';
 @import './assets/css/defolts.scss';
 
 .parser{
@@ -36,8 +34,11 @@ export default {
   flex-flow: column;
   align-items: flex-end;
 
+  &__table{
+    margin: 0 auto;
+  }
   &__file{
-    margin-right: 10px;
+    margin-right: 20px;
     margin-top: 20px;
   }
   &__alert{
