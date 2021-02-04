@@ -1,3 +1,5 @@
+@import '../colors.scss';
+
 * {
 	box-sizing: border-box;
 	padding: 0;
@@ -7,26 +9,24 @@
 }
 body,
 html {
-	color: rgb(41, 41, 41);
+	color: $primaty;
 
 	height: 100%;
 
 	font-family: 'Roboto';
 }
 
-.app__container {
-	height: 100vh;
-
-	display: flex;
-	flex-flow: column;
-}
-
 .container {
 	width: 100%;
-	max-width: 1100px;
+	max-width: 1500px;
+	min-height: 100vh;
 	margin: 0 auto;
 
 	position: relative;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 label {
@@ -34,7 +34,7 @@ label {
 }
 
 table, th, td {
-	border: 2px solid black;
+	border: 2px solid $primaty;
 	border-collapse: collapse;
 }
 
@@ -61,6 +61,6 @@ input:focus{
 }
 
 a {
-	color: #1f1f1f;
+	color: $primaty;
 	text-decoration: none;
 }

@@ -1,28 +1,31 @@
 <template>
-    <table class="table">
-      <template v-if="showTable">
-        <thead class="table__header table-row">
-          <td v-for="header in tableHeaders" :key="header">{{header}}</td>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id" class="table__user table-row">
-              <td>{{ user['ID'] }}</td>
-              <td :class="{'invalid': !user['Full Name'] }">{{ user['Full Name'] }}</td>
-              <td :class="{'invalid': !returnNumberIfValid(user['Phone'])}">{{ returnNumberIfValid(user['Phone']) ? returnNumberIfValid(user['Phone']) : user['Phone']}}</td>
-              <td :class="{'invalid': !user['Email'] }">{{ user['Email'] }}</td>
-              <td :class="{'invalid': !isAgeValid(user['Age'])}">{{ user["Age"] }}</td>
-              <td :class="{'invalid': !isExperienceValid(user['Experience'], user['Age'])}">{{ user['Experience'] }}</td>
-              <td :class="{'invalid': !isYearlyIncomeValid(user['Yearly Income'])}">{{ user['Yearly Income'] }}</td>
-              <td :class="{'invalid': !isHasChildrenValid(user['Has children'])}">{{ user['Has children'] === '' ? 'FALSE' : user['Has children'] }}</td>
-              <td :class="{'invalid': !ifStateValidReturnState(user['License states'])}">{{ ifStateValidReturnState(user['License states']) ? ifStateValidReturnState(user['License states']) : user['License states'] }}</td>
-              <td :class="{'invalid': !isDataValid(user['Expiration date'])}">{{ user['Expiration date'] }}</td>
-              <td :class="{'invalid': !isLicenseNumberValid(user['License number'])}">{{ user['License number'] }}</td>
-              <td>{{ user['Duplicate with'] }}</td>
-          </tr>
-        </tbody>
-      </template>
-      <ErrorAlert v-if="showAlert" class="parser__alert"></ErrorAlert>
-    </table>
+  <div class="table-wrapper">
+      <div class="infoWindow infoWindow--placeholder table-placeholder" v-if="!showAlert && !showTable">
+          Users will displayed here
+      </div>
+      <table v-if="showTable" class="table">
+          <thead class="table__header table-row">
+            <td v-for="header in tableHeaders" :key="header">{{header}}</td>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id" class="table__user table-row">
+                <td>{{ user[tableHeaders[0]] }}</td>
+                <td :class="{'invalid': !user[tableHeaders[1]] }">{{ user[tableHeaders[1]] }}</td>
+                <td :class="{'invalid': !returnPhoneNumberIfValid(user[tableHeaders[2]])}">{{ returnPhoneNumberIfValid(user[tableHeaders[2]]) ? returnPhoneNumberIfValid(user[tableHeaders[2]]) : user[tableHeaders[2]]}}</td>
+                <td :class="{'invalid': !isEmailValid(user[tableHeaders[3]]) }">{{ user[tableHeaders[3]] }}</td>
+                <td :class="{'invalid': !isAgeValid(user[tableHeaders[4]])}">{{ user[tableHeaders[4]] }}</td>
+                <td :class="{'invalid': !isExperienceValid(user[tableHeaders[5]], user[tableHeaders[4]])}">{{ user[tableHeaders[5]] }}</td>
+                <td :class="{'invalid': !ifYearlyIncomeReturnStrOrFalse(user[tableHeaders[6]])}">{{ ifYearlyIncomeReturnStrOrFalse(user[tableHeaders[6]]) ? ifYearlyIncomeReturnStrOrFalse(user[tableHeaders[6]]) : user[tableHeaders[6]]}}</td>
+                <td :class="{'invalid': !isHasChildrenValid(user[tableHeaders[7]])}">{{ user[tableHeaders[7]] === '' ? 'FALSE' : user[tableHeaders[7]]}}</td>
+                <td :class="{'invalid': !ifStateValidReturnState(user[tableHeaders[8]])}">{{ ifStateValidReturnState(user[tableHeaders[8]]) ? ifStateValidReturnState(user[tableHeaders[8]]) : user[tableHeaders[8]] }}</td>
+                <td :class="{'invalid': !isDataValid(user[tableHeaders[9]])}">{{ user[tableHeaders[9]] }}</td>
+                <td :class="{'invalid': !isLicenseNumberValid(user[tableHeaders[10]])}">{{ user[tableHeaders[10]] }}</td>
+                <td>{{ user[tableHeaders[11]] }}</td>
+            </tr>
+          </tbody>
+      </table>
+      <ErrorAlert v-if="showAlert"></ErrorAlert>
+  </div>
 </template>
 
 <script>
@@ -73,12 +76,17 @@ export default {
         let users = this.users
         users.forEach((item, i) => {
           for(let j = 0; j < users.length; j++){
-              let itemPhone = String(item['Phone'])
+              let itemPhone = this.returnPhoneNumberIfValid(String(item['Phone']))
               let itemEmail = String(item['Email']).toLowerCase()
-              let testItemPhone = String(users[j]['Phone'])
+              let testItemPhone = this.returnPhoneNumberIfValid(String(users[j]['Phone']))
               let testItemEmail = String(users[j]['Email']).toLowerCase()
 
-              if(i !== j && (itemPhone === testItemPhone || itemEmail === testItemEmail)){
+              if(!itemPhone){
+                itemPhone = String(item['Phone'])
+                testItemPhone = String(users[j]['Phone'])
+              }
+
+              if(i !== j && (itemPhone === testItemPhone || itemEmail === testItemEmail)){  
                 item['Duplicate with'] = users[j]['ID']
                 break
               } 
@@ -93,7 +101,6 @@ export default {
           }
         })
       },
-      // validations
       isAgeValid(age){
         const ageNum = Number(age)
         if(ageNum < 21 || isNaN(ageNum)){
@@ -102,34 +109,46 @@ export default {
           return true
         }
       },
+      isEmailValid(email){
+        const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return regexp.test(email)
+      },
       isExperienceValid(exp, age){
         const expNum = Number(exp)
         const ageNum = Number(age)
-        if(expNum > (ageNum - 21) || expNum < 0){                                            //?
+        if(isNaN(expNum) || (expNum > (ageNum - 21)) && expNum !== 0 || expNum < 0){                                            
           return false
         }else{
           return true
         }
       },
       isHasChildrenValid(has){
-        const hasLowerCase = has.toLowerCase()
-        if(hasLowerCase === 'true' || hasLowerCase === 'false' || hasLowerCase === ''){
+        if(has === 'TRUE' || has === 'FALSE' || has === ''){
           return true
         }else{
           return false
         }
       },
-      isYearlyIncomeValid(income){
+      ifYearlyIncomeReturnStrOrFalse(income){
         const incomeNum = Number(income)
-        const regexp = /^[0-9]+.[0-9]{2}$/
-        if(!regexp.test(income) || incomeNum > 1000000 || incomeNum < 0){
+        const regexpDec = /^[0-9]+.[0-9]+$/
+        const regexpInt = /^[0-9]+$/
+
+        if(isNaN(incomeNum) || incomeNum > 1000000 || incomeNum < 0){
           return false
-        }else{
-          return true
         }
+
+        if(regexpDec.test(income)){
+          return incomeNum.toFixed(2)
+        }
+        if(regexpInt.test(income)){
+          return income+'.00'
+        }
+
+        return false
       },
       isLicenseNumberValid(licenseNum){
-        if(String(licenseNum).length === 6){
+        if(String(licenseNum).length === 6 && !String(licenseNum).includes(' ')){                          
           return true
         }else{
           return false
@@ -147,18 +166,29 @@ export default {
         return (date_regex1.test(timestamp)) || (date_regex2.test(timestamp)) 
       },
       ifStateValidReturnState(state){
-        const regexp = /^$/
-        
+        let statesNames = [state]
+        if(state.includes('|')){
+          statesNames = state.split('|').map(item => item.trim())
+        }
+
+        let result = []
         for(let obj of UStates){
           for(let key in obj){
-            if(key === state || obj[key] === state){
-              return obj[key]
+            for(let st of statesNames){
+              if(key === st || obj[key] === st){
+                result.push(obj[key])
+              }
             }
           }
         }
-        return false
+        if(result.length === statesNames.length){
+          return result.join(', ')
+        }else{
+          return false
+        }
+        
       },
-      returnNumberIfValid(number){
+      returnPhoneNumberIfValid(number){
         if(!number){
           return false
         }
@@ -198,12 +228,20 @@ export default {
 
 <style lang="scss" scoped>
 @import '../assets/colors.scss';
+@import '../../node_modules/animate.css/animate.min.css';
 
+.table-wrapper{
+  width: 100%;
+}
 .table{
+  width: 100%;
   &__header{
     td{
       background-color: $table-header;
-      font-weight: bold;
+
+      &:first-child{
+        font-weight: bold;
+      }
     }
   }
   &-row{
@@ -212,9 +250,42 @@ export default {
     }
   }
   &__user{
-    td.invalid{
-      background-color: rgba(255, 38, 38, 0.363);
+    td{
+
+      &:last-child{
+        font-weight: bold;
+      }
+      &.invalid{
+        background-color: $error;
+      }
     }
+  }
+}
+.infoWindow{
+  width: 100%;  
+
+  padding: 30px 0;
+
+  text-align: center;
+  font-weight: normal;
+  font-size: 20px;
+
+  &--placeholder{
+    color: darken($table-placeholder, 100%);
+    background-color: $table-placeholder;
+    border: 1px solid $table-placeholder-border;
+
+    height: 70vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  &--error{
+    background-color: $error;
+    border: 1px solid $error-border;
+
+    animation: zoomIn .2s;
   }
 }
 </style>

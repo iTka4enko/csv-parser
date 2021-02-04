@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="parser">
+        <FileInput class="parser__file"></FileInput>
         <Table class="parser__table"></Table>
         <FileInput class="parser__file"></FileInput>
     </div>
@@ -32,18 +33,27 @@ export default {
 .parser{
   display: flex;
   flex-flow: column;
+  justify-content: center;
   align-items: flex-end;
+
+  padding-bottom: 20px;
+
+  width: 100%;
 
   &__table{
     margin: 0 auto;
+
+    table{
+      margin: 0 auto;
+    }
   }
   &__file{
-    margin-right: 20px;
-    margin-top: 20px;
+    margin: 20px 30px 20px 0;
   }
   &__alert{
     margin: 0 auto;
     margin-top: 60px;
   }
 }
+
 </style>

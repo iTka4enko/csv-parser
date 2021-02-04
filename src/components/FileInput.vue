@@ -1,7 +1,7 @@
 <template>
     <div class="FileInput">
         <input @change="checkExtentionAndParseCSV" class="FileInput__input" type="file" name="photo">
-        <button @click.prevent="chouseFile" class="FileInput__button">Impor User</button>
+        <button @click.prevent="chouseFile" class="FileInput__button">Import Users</button>
     </div>
 </template>
 
@@ -65,6 +65,13 @@
         font-size: 16px;
 
         overflow: hidden;
+
+        &:hover{
+            background-color: darken($file-input, 3%)
+        }
+        &:active{
+            background-color: darken($file-input, 10%)
+        }
     }
 }
 

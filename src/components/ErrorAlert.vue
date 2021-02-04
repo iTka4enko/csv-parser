@@ -1,29 +1,27 @@
 <template>
-    <div class="errorAlert">
-        error
+    <div class="infoWindow infoWindow--error">
+        <template v-if="fileExt === 'csv'">
+            File format is not correct
+        </template>
+        <template v-else>
+            File is not CSV
+        </template>
     </div>
 </template> 
 
 <script>
+import {mapState} from 'vuex'
+
 export default {
     name: 'ErrorAlert',
     props: {
         error: String
+    },
+    computed:{
+        ...mapState([
+            'fileExt'
+        ])
     }
 }
 </script>
 
-<style lang="scss" scoped>
-@import '../assets/colors.scss';
-
-.errorAlert{
-    width: 80%;  
-
-    padding: 30px 0;
-
-    background-color: $error-alert-bgc;
-    border: 1px solid $error-alert-border;
-
-    text-align: center;
-}
-</style>
